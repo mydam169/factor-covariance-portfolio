@@ -1,38 +1,29 @@
-# Factor Investing: Does Factor-Based Portfolio Construction Improve Robustness?
+# Factor Investing: Does Factor-Based Portfolio Construction Improve Robustness and Performance?
 
 Research question: does covariance estimation via a factor model (Fama-French
-5-factor) produce more robust / better out-of-sample GMV and mean-variance
-portfolios than (a) sample historical covariance, (b) Ledoit-Wolf shrinkage,
-and (c) naive 1/N, under walk-forward backtesting?
+5-factor) produce more robust / better out-of-sample GMV than 
+(a) sample historical covariance, 
+(b) Ledoit-Wolf shrinkage,
+(c) naive 1/N, under walk-forward backtesting?
 
 ## Project phases
 
-1. **Data pipeline** — Fama-French factors, FRED macro series, price history
+1. **Data pipeline** — Fama-French factors, price history
    for a 48-stock universe across 4 macro/style groups (cyclical growth,
    cyclical value, defensive growth, defensive value), 10-year window.
 2. **Factor regressions** — per-stock and portfolio-level time-series
-   regressions (FF3 / FF5), with full diagnostic battery (HAC errors,
-   Ljung-Box, Breusch-Pagan, VIF, QQ/normality checks).
-3. **Fama-MacBeth (appendix / robustness check only)** — cross-sectional
-   pass to test whether factor exposures are priced in this universe. Not a
-   dependency for portfolio construction — documented explicitly as
-   diagnostic, not load-bearing.
-4. **Covariance estimators** — historical sample, Ledoit-Wolf shrinkage,
-   factor-based (Sigma = B Sigma_F B' + D).
-5. **Portfolio construction** — GMV and mean-variance optimizers, plus 1/N
+   regressions (FF3 / FF5), with diagnostic checks (HAC errors,
+   Ljung-Box, Breusch-Pagan, VIF, QQ plot).
+3. **Covariance estimators** — historical sample, Ledoit-Wolf shrinkage,
+   factor-based using $\Sigma = B \Sigma_F B' + D$.
+4. **Portfolio construction** — GMV portfolios via `cvxpy`, against 1/N
    benchmark, under long-only / position-cap constraints (TBD in config).
-6. **Walk-forward backtest engine** — rolling estimation window, fixed
+5. **Walk-forward backtest engine** — rolling estimation window, fixed
    rebalance frequency, transaction cost model.
-7. **Evaluation** — Sharpe ratio, turnover, Herfindahl concentration, max
+6. **Evaluation** — Sharpe and Sortino ratios, turnover, Herfindahl concentration, max
    drawdown, and formal significance testing (Jobson-Korkie / Memmel,
    stationary bootstrap) across methods.
 
-Explicitly out of scope for now (see project conversation log): Michaud
-resampling (deferred — layered decision-rule, not a parallel Sigma
-estimator), regime-switching covariance (deferred to a possible Phase 3,
-pending Phase 1 results), CVaR-based portfolios (Phase 2 stretch goal,
-requires scenario generation, not a trivial extension of the covariance-only
-approach).
 
 ## Repo layout
 
@@ -43,9 +34,9 @@ data/processed/          Cleaned / merged datasets (gitignored)
 notebooks/               Exploratory notebooks only — no logic lives here
 src/factor_project/
   data/                  Fetching + validating factors, macro, prices
-  models/                Time-series factor regressions, diagnostics, Fama-MacBeth
+  models/                Time-series factor regressions, diagnostics
   covariance/            Historical, shrinkage, and factor-based Sigma estimators
-  portfolio/             Optimizers (GMV, mean-variance, 1/N) + constraints
+  portfolio/             Optimizers (GMV, 1/N) + constraints
   backtest/              Walk-forward engine + transaction cost model
   evaluation/            Performance metrics + statistical significance tests
   utils/                 Shared I/O and config helpers

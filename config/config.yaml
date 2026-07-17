@@ -1,0 +1,58 @@
+# Central configuration for the project
+# Nothing in src/ or scripts/ should hardcode values that belong here.
+
+# Four groups of assets are considered
+universe:
+  cyclical_growth:
+    tech: [MSFT, NVDA, ADBE, CRM]
+    industrials: [HON, CAT, DE, UNP]
+    luxury: [EL, RL, TPR, LVMUY]
+  cyclical_value:
+    commodities: [XOM, CVX, FCX, NEM]
+    auto_parts: [GM, F, BWA, GT]
+    financials: [JPM, BAC, GS, MS]
+  defensive_growth:
+    retail: [WMT, COST, TGT, HD]
+    health_care: [JNJ, PFE, UNH, ABT]
+    food_beverage: [KO, PEP, MDLZ, GIS]
+  defensive_value:
+    utilities: [DUK, SO, NEE, D]
+    telecoms: [T, VZ, TMUS, CMCSA]
+    real_estate: [SPG, PLD, O, PSA]
+
+data:
+  start_date: "2015-01-01"   # 10 years of data
+  end_date: "2025-01-01"
+  price_field: "Close"       # auto_adjust=True in yfinance
+  fama_french_url: "https://mba.tuck.dartmouth.edu/pages/faculty/ken.french/ftp/F-F_Research_Data_5_Factors_2x3_daily_CSV.zip"
+  fred_series: ["GS10", "CPIAUCSL", "UNRATE"]
+
+factor_model:
+  type: "FF5"                # FF3 or FF5
+  regression_cov_type: "HAC" # To guard against residual autocorrelation
+  hac_maxlags: 5
+
+covariance_methods:
+  - historical
+  - shrinkage         # Ledoit-Wolf for covariance 
+  - factor_based      # Sigma = B Sigma_F B' + D
+
+portfolio_methods:
+  - gmv
+  - mean_variance     # to be removed
+  - equal_weight      # 1/N benchmark
+
+backtest:
+  estimation_window_days: 504   # ~2 years rolling, NOT expanding -- see stationarity discussion
+  rebalance_frequency: "M"      # monthly; daily rejected as unrealistic
+  long_only: true
+  max_weight_per_asset: 0.15    # position cap -- prevents unconstrained MV blowing up on 8-48 correlated names
+  transaction_cost_bps: 10      # applied to turnover at each rebalance
+
+evaluation:
+  significance_test: "jobson_korkie_memmel"
+  bootstrap_method: "stationary_bootstrap"
+  metrics: [sharpe, annualized_return, annualized_vol, max_drawdown, turnover, herfindahl_index]
+
+deferred_scope:
+  - regime_switching_covariance  # Pending Phase 1 rolling-window results

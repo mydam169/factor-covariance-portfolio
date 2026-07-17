@@ -1,0 +1,13 @@
+numpy
+pandas
+scipy
+statsmodels
+scikit-learn      # LedoitWolf shrinkage estimator
+cvxpy             # portfolio optimization (GMV / mean-variance with constraints)
+yfinance
+pandas_datareader # FRED
+matplotlib
+seaborn
+pyyaml
+pytest
+arch              # bootstrap utilities (stationary bootstrap) -- confirm this is the module we want at implementation time
